@@ -1,0 +1,69 @@
+#include <stdio.h>
+
+#define MAX 30
+
+int parent[MAX];
+
+// Find parent (Disjoint Set)
+int find(int i) {
+    while (parent[i] != i)
+        i = parent[i];
+    return i;
+}
+
+// Union of sets
+void union_set(int i, int j) {
+    int a = find(i);
+    int b = find(j);
+    parent[a] = b;
+}
+
+int main() {
+    int n, a[MAX][MAX];
+    int i, j, edges = 0, min, u = 0, v = 0, cost = 0;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter adjacency matrix (9999 for no edge):\n");
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+            scanf("%d", &a[i][j]);
+
+    // Initialize parent array
+    for (i = 0; i < n; i++)
+        parent[i] = i;
+
+    printf("\nEdges in MST using Kruskal:\n");
+
+    while (edges < n - 1) {
+        min = 9999;
+
+        // Pick the smallest edge
+        for (i = 0; i < n; i++)
+            for (j = 0; j < n; j++)
+                if (a[i][j] < min) {
+                    min = a[i][j];
+                    u = i;
+                    v = j;
+                }
+
+        // Check if including this edge forms a cycle
+        int set_u = find(u);
+        int set_v = find(v);
+
+        if (set_u != set_v) {
+            printf("%d -> %d (Cost = %d)\n", u, v, min);
+            cost += min;
+            union_set(set_u, set_v);
+            edges++;
+        }
+
+        // Mark edge as used
+        a[u][v] = a[v][u] = 9999;
+    }
+
+    printf("\nTotal cost of MST = %d\n", cost);
+
+    return 0;
+}
